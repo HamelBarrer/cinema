@@ -1,0 +1,57 @@
+import { Prisma, PrismaClient } from '@prisma/client';
+import { Movie } from '../interfaces/movie.interface';
+import { getThirdWeek } from '../utils/dates';
+
+export const readNoveltyMovie = async () => {
+  const prisma = new PrismaClient();
+
+  console.log(getThirdWeek());
+
+  const data = await prisma.movies.findMany({
+    where: {
+      releaseData: {
+        lte: getThirdWeek(),
+      },
+    },
+  });
+
+  return data;
+};
+
+export const insertMovie = async (movie: Movie) => {
+  try {
+    const prima = new PrismaClient();
+
+    const data = await prima.movies.create({
+      data: {
+        title: movie.title,
+        releaseData: new Date(movie.releaseData.replace('-', '/')),
+        movieCategoryId: movie.movieCategoryId,
+      },
+      select: {
+        movieId: true,
+        title: true,
+        releaseData: true,
+        movieCategory: {
+          select: {
+            movieCategoryId: true,
+            name: true,
+          },
+        },
+      },
+    });
+
+    return data;
+  } catch (error) {
+    if (error instanceof Prisma.PrismaClientKnownRequestError) {
+      if (error.code === 'P2002') {
+        throw new Error('The title exists');
+      }
+      if (error.code === 'P2003') {
+        throw new Error('The relation not exists');
+      }
+    }
+
+    return error;
+  }
+};
