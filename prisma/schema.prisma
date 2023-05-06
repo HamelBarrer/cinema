@@ -1,0 +1,50 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Users {
+  userId        Int             @id @default(autoincrement())
+  firstName     String
+  lastName      String
+  createdAt     DateTime        @default(now())
+  UsersOnMovies UsersOnMovies[]
+}
+
+model MovieCategories {
+  movieCategoryId Int      @id @default(autoincrement())
+  name            String   @unique
+  isActive        Boolean  @default(true)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  Movie           Movies[]
+}
+
+model Movies {
+  movieId         Int             @id @default(autoincrement())
+  title           String          @unique
+  movieCategory   MovieCategories @relation(fields: [movieCategoryId], references: [movieCategoryId], onUpdate: Cascade, onDelete: Cascade)
+  movieCategoryId Int
+  releaseData     DateTime
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+  UsersOnMovies   UsersOnMovies[]
+}
+
+model UsersOnMovies {
+  userOnMovieId Int      @id @default(autoincrement())
+  user          Users    @relation(fields: [userId], references: [userId], onDelete: Cascade, onUpdate: Cascade)
+  userId        Int
+  movie         Movies   @relation(fields: [movieId], references: [movieId], onDelete: Cascade, onUpdate: Cascade)
+  movieId       Int
+  movieIsView   Boolean  @default(false)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
