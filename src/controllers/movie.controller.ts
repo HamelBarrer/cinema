@@ -1,5 +1,9 @@
 import { Request, Response } from 'express';
-import { insertMovie, readNoveltyMovie } from '../services/movie.service';
+import {
+  insertMovie,
+  readNoveltyMovie,
+  showMovie,
+} from '../services/movie.service';
 
 export const getNoveltyMovie = async (_: Request, res: Response) => {
   const data = await readNoveltyMovie();
@@ -26,4 +30,15 @@ export const createMovie = async (req: Request, res: Response) => {
   } catch (error: any) {
     return res.status(500).json({ data: error.message });
   }
+};
+
+export const checkShowView = async (req: Request, res: Response) => {
+  const movieId = parseInt(req.params.movieId);
+  const { userId } = req.body;
+
+  if (!userId) return res.status(400).json({ data: 'User Id is required' });
+
+  const data = await showMovie(userId, movieId);
+
+  return res.status(201).json({ data });
 };

@@ -55,3 +55,32 @@ export const insertMovie = async (movie: Movie) => {
     return error;
   }
 };
+
+export const showMovie = async (userId: number, movieId: number) => {
+  const prisma = new PrismaClient();
+
+  const data = await prisma.usersOnMovies.create({
+    data: {
+      userId,
+      movieId,
+      movieIsView: true,
+    },
+    select: {
+      movie: {
+        select: {
+          movieId: true,
+          title: true,
+        },
+      },
+      user: {
+        select: {
+          userId: true,
+          firstName: true,
+          lastName: true,
+        },
+      },
+    },
+  });
+
+  return data;
+};

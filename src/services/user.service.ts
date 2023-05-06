@@ -21,3 +21,37 @@ export const insertUser = async (user: User) => {
 
   return data;
 };
+
+export const listShowMovies = async (userId: number) => {
+  const prisma = new PrismaClient();
+
+  const data = await prisma.users.findMany({
+    where: {
+      userId,
+    },
+    select: {
+      userId: true,
+      firstName: true,
+      lastName: true,
+      UsersOnMovies: {
+        select: {
+          movie: {
+            select: {
+              movieId: true,
+              title: true,
+              releaseData: true,
+              movieCategory: {
+                select: {
+                  movieCategoryId: true,
+                  name: true,
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+  });
+
+  return data;
+};
