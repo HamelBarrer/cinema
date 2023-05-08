@@ -2,10 +2,47 @@ import { Prisma, PrismaClient } from '@prisma/client';
 import { Movie } from '../interfaces/movie.interface';
 import { getThirdWeek } from '../utils/dates';
 
-export const readNoveltyMovie = async () => {
+export const readMovies = async (
+  title: string,
+  category: string,
+  order: any,
+) => {
   const prisma = new PrismaClient();
 
-  console.log(getThirdWeek());
+  const data = await prisma.movies.findMany({
+    select: {
+      movieId: true,
+      title: true,
+      movieCategory: {
+        select: {
+          movieCategoryId: true,
+          name: true,
+        },
+      },
+      releaseData: true,
+    },
+    where: {
+      title: {
+        contains: title,
+      },
+      movieCategory: {
+        name: {
+          contains: category,
+        },
+      },
+    },
+    orderBy: [
+      {
+        releaseData: order,
+      },
+    ],
+  });
+
+  return data;
+};
+
+export const readNoveltyMovie = async () => {
+  const prisma = new PrismaClient();
 
   const data = await prisma.movies.findMany({
     where: {

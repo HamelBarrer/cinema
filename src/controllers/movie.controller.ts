@@ -1,9 +1,24 @@
 import { Request, Response } from 'express';
 import {
   insertMovie,
+  readMovies,
   readNoveltyMovie,
   showMovie,
 } from '../services/movie.service';
+
+export const getMovies = async (req: Request, res: Response) => {
+  const title = (req.query.title as string) ?? '';
+  const category = (req.query.category as string) ?? '';
+  const order = (req.query.order as string) ?? 'asc';
+
+  if (order !== 'asc' && order !== 'desc')
+    return res.status(400).json({ data: 'Sort only works with asc or desc' });
+
+  const data = await readMovies(title, category, order);
+  if (data.length === 0) return res.status(204).json();
+
+  return res.status(200).json({ data });
+};
 
 export const getNoveltyMovie = async (_: Request, res: Response) => {
   const data = await readNoveltyMovie();
